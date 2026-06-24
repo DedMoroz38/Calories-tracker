@@ -1,0 +1,33 @@
+.root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) var(--gutter) 16px;
+  max-width: var(--page-max);
+  margin: 0 auto;
+}
+
+.title {
+  font-size: var(--text-h2);
+  font-weight: var(--weight-bold);
+}
+
+.errMsg {
+  color: var(--destructive);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.chartLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}

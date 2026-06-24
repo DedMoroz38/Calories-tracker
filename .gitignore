@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+
+# Local tooling / agent artifacts
+.claude/
+.playwright-mcp/
+
+# Secrets & env
+.env
+.env.*
+!.env.example
+backend/.env
+
+# Go build output / binaries
+backend/api
+backend/server
+*.exe
+*.test
+*.out

@@ -1,0 +1,74 @@
+.root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--gutter);
+  gap: 24px;
+}
+
+.dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--surface-card-2);
+  transition: background var(--duration-normal) var(--ease-out),
+              width    var(--duration-normal) var(--ease-out);
+}
+
+.activeDot {
+  width: 24px;
+  background: var(--action);
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.stepWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stepTitle {
+  font-size: var(--text-h3);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+}
+
+.stepSub {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-top: -8px;
+}
+
+.fieldWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-secondary);
+}
+
+.btnRow {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.error {
+  font-size: var(--text-sm);
+  color: var(--destructive);
+}

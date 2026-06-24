@@ -1,0 +1,25 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.dot {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-pill);
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.hit    { background: var(--state-hit); }
+.miss   { background: var(--state-miss); }
+.today  { background: var(--state-today); box-shadow: 0 0 10px rgba(59,130,246,0.5); }
+.future { background: var(--state-future); }
+
+.letter {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-tertiary);
+}

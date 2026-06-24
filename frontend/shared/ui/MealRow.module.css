@@ -1,0 +1,47 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.row:last-child { border-bottom: none; }
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.main:disabled { cursor: default; }
+
+.name {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+
+.cals {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.macros {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.carb    { font-size: var(--text-xs); color: var(--carb-500); font-weight: var(--weight-medium); }
+.fat     { font-size: var(--text-xs); color: var(--fat-500);  font-weight: var(--weight-medium); }
+.protein { font-size: var(--text-xs); color: var(--protein-500); font-weight: var(--weight-medium); }
+
+.del { flex-shrink: 0; color: var(--text-tertiary); }
+.del:hover { color: var(--destructive); }

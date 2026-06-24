@@ -1,0 +1,20 @@
+.card {
+  background: var(--surface-card);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.clickable {
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+.clickable:hover  { background: var(--surface-card-2); }
+.clickable:active { transform: scale(0.99); }
+
+.pad-none { padding: 0; }
+.pad-sm   { padding: 12px; }
+.pad-md   { padding: 16px; }
+.pad-lg   { padding: 20px; }

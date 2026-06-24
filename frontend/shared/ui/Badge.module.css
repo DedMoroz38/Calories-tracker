@@ -1,0 +1,18 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.default  { background: var(--surface-card-2); color: var(--text-secondary); }
+.carb     { background: var(--carb-200);     color: var(--carb-500); }
+.fat      { background: var(--fat-200);      color: var(--fat-500); }
+.protein  { background: var(--protein-200);  color: var(--protein-500); }
+.calorie  { background: var(--calorie-200);  color: var(--calorie-500); }
+.action   { background: var(--action-surface); color: var(--action); }

@@ -1,0 +1,25 @@
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    transform  var(--duration-fast) var(--ease-out);
+}
+
+.iconBtn:active { transform: scale(0.9); }
+.iconBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.ghost  { background: transparent; color: var(--text-secondary); }
+.ghost:hover  { background: var(--surface-card-2); color: var(--text-primary); }
+
+.filled { background: var(--surface-card-2); color: var(--text-primary); }
+.filled:hover { background: var(--border-strong); }
+
+.sm  { width: 32px; height: 32px; }
+.md  { width: 40px; height: 40px; }
+.lg  { width: 48px; height: 48px; }

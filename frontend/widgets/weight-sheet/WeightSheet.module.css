@@ -1,0 +1,62 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn var(--duration-fast) var(--ease-out);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.sheet {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  background: var(--surface-card);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  border: 1px solid var(--border);
+  padding: 12px var(--gutter) calc(var(--gutter) + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: slideUp var(--duration-normal) var(--ease-spring);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.handle {
+  width: 36px;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--border-strong);
+  margin: 0 auto 4px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: var(--text-h3);
+  font-weight: var(--weight-bold);
+}
+
+.sub {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.error {
+  font-size: var(--text-sm);
+  color: var(--destructive);
+}

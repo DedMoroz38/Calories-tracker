@@ -1,0 +1,100 @@
+.root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--gutter);
+  background: var(--surface-bg);
+}
+
+.content {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.logoMark {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--r-xl);
+  background: var(--action);
+  color: #fff;
+  font-size: 36px;
+  font-weight: var(--weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
+}
+
+.title {
+  font-size: var(--text-h2);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sub {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  max-width: 260px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.telegramWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 44px;
+}
+
+.hint {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.devSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.devNote {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.error {
+  font-size: var(--text-sm);
+  color: var(--destructive);
+  text-align: center;
+}
+
+.footer {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.link {
+  color: var(--action);
+  text-decoration: underline;
+}
