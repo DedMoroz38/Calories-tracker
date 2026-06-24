@@ -10,6 +10,9 @@
   width: 28px;
   height: 28px;
   border-radius: var(--r-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: background var(--duration-fast) var(--ease-out);
 }
 
@@ -17,6 +20,16 @@
 .miss   { background: var(--state-miss); }
 .today  { background: var(--state-today); box-shadow: 0 0 10px rgba(59,130,246,0.5); }
 .future { background: var(--state-future); }
+
+/* Streak flame — overrides the dot fill regardless of underlying state. */
+.fire {
+  background: rgba(251, 146, 60, 0.18);
+  box-shadow: 0 0 12px rgba(251, 146, 60, 0.55);
+}
+
+.flame {
+  color: var(--fire);
+}
 
 .letter {
   font-size: var(--text-xs);

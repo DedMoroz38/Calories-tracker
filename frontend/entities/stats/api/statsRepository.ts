@@ -13,7 +13,8 @@ export interface StatsData {
   streak:          number;
 }
 
-/** GET /stats?range=week|month|year */
+/** GET /stats?range=week|month|year — sends tz so the streak matches the home screen. */
 export async function getStats(range: StatsRange = "week"): Promise<StatsData> {
-  return http.get<StatsData>(`/stats?range=${range}`);
+  const tz = new Date().getTimezoneOffset();
+  return http.get<StatsData>(`/stats?range=${range}&tz=${tz}`);
 }

@@ -18,11 +18,12 @@ type SummaryController struct {
 func (sc SummaryController) GetSummary(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c)
 	dateStr := c.Query("date")
+	offsetMin := c.QueryInt("tz", 0)
 
 	ss := services.SummaryService{}
 	ss.DB = c.Locals("gorm").(*gorm.DB)
 
-	summary, apiErr := ss.GetSummary(userID, dateStr)
+	summary, apiErr := ss.GetSummary(userID, dateStr, offsetMin)
 	if apiErr != nil {
 		return sc.Fail(c, apiErr)
 	}
@@ -35,11 +36,12 @@ func (sc SummaryController) GetSummary(c *fiber.Ctx) error {
 func (sc SummaryController) GetStats(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c)
 	rangeStr := c.Query("range")
+	offsetMin := c.QueryInt("tz", 0)
 
 	ss := services.SummaryService{}
 	ss.DB = c.Locals("gorm").(*gorm.DB)
 
-	stats, apiErr := ss.GetStats(userID, rangeStr)
+	stats, apiErr := ss.GetStats(userID, rangeStr, offsetMin)
 	if apiErr != nil {
 		return sc.Fail(c, apiErr)
 	}

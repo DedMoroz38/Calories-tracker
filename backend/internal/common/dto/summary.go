@@ -16,11 +16,13 @@ type WeightInfo struct {
 }
 
 // DayState is one entry in the 7-day week array returned by GET /summary.
-// State is one of: hit | miss | today | future.
+// State is one of: hit | miss | today | future. Fire is true for the current
+// day once its calorie goal has been met (drives the streak flame on the dot).
 type DayState struct {
 	Date   string `json:"date"`
 	Letter string `json:"letter"`
 	State  string `json:"state"`
+	Fire   bool   `json:"fire"`
 }
 
 // SummaryResponse is the full payload for GET /api/v1/summary.
@@ -30,7 +32,10 @@ type SummaryResponse struct {
 	Goals  MacroTotals `json:"goals"`
 	Weight WeightInfo  `json:"weight"`
 	Streak int         `json:"streak"`
-	Week   []DayState  `json:"week"`
+	// StreakActiveToday is true when today's calorie goal has been met, i.e. the
+	// streak already counts today (drives the flame next to the date header).
+	StreakActiveToday bool       `json:"streak_active_today"`
+	Week              []DayState `json:"week"`
 }
 
 // CaloriesEntry is one data point in the calories_per_day series.

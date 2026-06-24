@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Scale } from "lucide-react";
+import { Scale, Flame } from "lucide-react";
 import {
   MacroRing, ProgressBar, Card, DayDot, Stat, IconButton, MealRow,
   TabBar,
@@ -70,6 +70,9 @@ function HomeScreen() {
             <p className={styles.greeting}>Today</p>
             <h1 className={styles.date}>
               {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+              {summary?.streak_active_today && (
+                <Flame size={22} className={styles.fireIcon} fill="currentColor" aria-label="Streak active" />
+              )}
             </h1>
           </div>
           <IconButton label="Log weight" variant="filled" onClick={() => setWeightOpen(true)}>
@@ -117,7 +120,7 @@ function HomeScreen() {
             <p className={styles.sectionLabel}>This week</p>
             <div className={styles.dots}>
               {week.map((d) => (
-                <DayDot key={d.date} letter={d.letter} state={d.state} />
+                <DayDot key={d.date} letter={d.letter} state={d.state} fire={d.fire} />
               ))}
             </div>
           </Card>

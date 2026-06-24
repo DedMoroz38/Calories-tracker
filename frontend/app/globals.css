@@ -36,6 +36,7 @@
   --state-miss:   rgba(242, 242, 247, 0.2);
   --state-today:  var(--action);
   --state-future: rgba(242, 242, 247, 0.1);
+  --fire:         #fb923c;
 
   /* Destructive */
   --destructive: #ef4444;

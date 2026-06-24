@@ -90,18 +90,27 @@ func (m SummaryModel) TotalsPerDayInRange(userID uint, start, end time.Time) ([]
 	return out, nil
 }
 
-// DaysWithEntries returns all distinct calendar days (UTC, truncated) on which
-// the user has at least one food entry, ordered descending (most recent first).
-// This is used to compute the consecutive-day logging streak.
-func (m SummaryModel) DaysWithEntries(userID uint) ([]time.Time, error) {
-	var days []time.Time
+
+// EntryCalories is a single food entry reduced to the two fields the streak
+// computation needs: when it was consumed and how many calories it carried.
+type EntryCalories struct {
+	ConsumedAt time.Time
+	Calories   float64
+}
+
+// AllEntryCalories returns (consumed_at, calories) for every food entry the
+// user has logged, most recent first. The streak computation buckets these
+// into local 3am-anchored days, so the raw instants are returned untouched —
+// no calendar/timezone logic happens in SQL.
+func (m SummaryModel) AllEntryCalories(userID uint) ([]EntryCalories, error) {
+	var rows []EntryCalories
 	err := m.DB.
 		Model(&db.FoodEntry{}).
-		Select("DISTINCT DATE_TRUNC('day', consumed_at) AS day").
+		Select("consumed_at, calories").
 		Where("user_id = ?", userID).
-		Order("day desc").
-		Pluck("day", &days).Error
-	return days, err
+		Order("consumed_at desc").
+		Scan(&rows).Error
+	return rows, err
 }
 
 // WeightEntriesInRange returns weight entries for a user in [start, end),

@@ -19,29 +19,62 @@ type SummaryService struct {
 // dayLetters maps time.Weekday to a single uppercase letter.
 var dayLetters = [7]string{"S", "M", "T", "W", "T", "F", "S"}
 
-// computeStreak counts consecutive calendar days going backwards from today
-// on which the user logged at least one food entry.
-func computeStreak(days []time.Time) int {
-	if len(days) == 0 {
-		return 0
+// streakRolloverHours is how far past local midnight a "streak day" stays open.
+// Food logged before 3am counts toward the previous day, and today's day does
+// not roll over until 3am — so late-night eating doesn't break a streak.
+const streakRolloverHours = 3
+
+// localStreakDay maps an absolute instant to the date-key of the local,
+// 3am-anchored "streak day" it belongs to. offsetMin is the client's
+// JavaScript getTimezoneOffset() value (minutes to add to local time to reach
+// UTC; e.g. UTC+3 → -180). The returned key is a midnight-UTC time used only
+// as a stable map/identity key — it carries no timezone meaning itself.
+func localStreakDay(instant time.Time, offsetMin int) time.Time {
+	// Normalise to UTC first: values read back from the DB may carry the
+	// server's local zone, and the wall-clock components below must be derived
+	// from a known reference, not whatever zone the time happens to be in.
+	utc := instant.UTC()
+	local := utc.Add(time.Duration(-offsetMin) * time.Minute)
+	shifted := local.Add(-streakRolloverHours * time.Hour)
+	return time.Date(shifted.Year(), shifted.Month(), shifted.Day(), 0, 0, 0, 0, time.UTC)
+}
+
+// bucketCaloriesByStreakDay sums each entry's calories into its local
+// 3am-anchored streak day.
+func bucketCaloriesByStreakDay(entries []models.EntryCalories, offsetMin int) map[time.Time]float64 {
+	bucket := make(map[time.Time]float64, len(entries))
+	for _, e := range entries {
+		bucket[localStreakDay(e.ConsumedAt, offsetMin)] += e.Calories
 	}
-	today := time.Now().UTC().Truncate(24 * time.Hour)
-	streak := 0
-	expected := today
-	for _, d := range days {
-		day := d.UTC().Truncate(24 * time.Hour)
-		if day.Equal(expected) {
-			streak++
-			expected = expected.Add(-24 * time.Hour)
-		} else if day.Before(expected) {
-			break
-		}
+	return bucket
+}
+
+// computeCalorieStreak counts consecutive streak days, ending at currentDay,
+// whose total calories reached the goal. todayMet reports whether currentDay
+// itself has already hit the goal. An unmet current day does not break the
+// streak (the day isn't over yet) — it simply isn't counted, and the run of
+// completed days before it is still returned.
+func computeCalorieStreak(bucket map[time.Time]float64, goal float64, currentDay time.Time) (streak int, todayMet bool) {
+	if goal <= 0 {
+		return 0, false
 	}
-	return streak
+	todayMet = bucket[currentDay] >= goal
+
+	day := currentDay
+	if !todayMet {
+		day = day.AddDate(0, 0, -1)
+	}
+	for bucket[day] >= goal {
+		streak++
+		day = day.AddDate(0, 0, -1)
+	}
+	return streak, todayMet
 }
 
 // GetSummary builds the home-screen payload for the given date (default today).
-func (s SummaryService) GetSummary(userID uint, dateStr string) (*dto.SummaryResponse, *errors.APIError) {
+// offsetMin is the client's getTimezoneOffset(), used so the streak is anchored
+// to the user's local 3am-to-3am day.
+func (s SummaryService) GetSummary(userID uint, dateStr string, offsetMin int) (*dto.SummaryResponse, *errors.APIError) {
 	sm := models.SummaryModel{DB: s.DB}
 	pm := models.ProfileModel{DB: s.DB}
 	wm := models.WeightModel{DB: s.DB}
@@ -82,38 +115,33 @@ func (s SummaryService) GetSummary(userID uint, dateStr string) (*dto.SummaryRes
 		currentWeight = latest.Weight
 	}
 
-	// Streak: consecutive days with any logged food, counting back from today.
-	activeDays, err := sm.DaysWithEntries(userID)
+	// Streak: consecutive local 3am-anchored days whose calories met the goal.
+	entries, err := sm.AllEntryCalories(userID)
 	if err != nil {
 		return nil, errors.Internal("could not compute streak")
 	}
-	streak := computeStreak(activeDays)
+	bucket := bucketCaloriesByStreakDay(entries, offsetMin)
+	currentDay := localStreakDay(time.Now().UTC(), offsetMin)
+	streak, todayMet := computeCalorieStreak(bucket, calorieGoal, currentDay)
 
-	// Build a set of days that have food entries for O(1) lookup below.
-	loggedDays := make(map[string]bool, len(activeDays))
-	for _, d := range activeDays {
-		loggedDays[d.UTC().Truncate(24*time.Hour).Format("2006-01-02")] = true
-	}
-
-	// 7-day week ending on targetDate.
-	today := time.Now().UTC().Truncate(24 * time.Hour)
+	// 7 streak-days ending on the current day. A day is a "hit" when its
+	// calories met the goal; today additionally carries the fire flag once met.
 	week := make([]dto.DayState, 7)
 	for i := range 7 {
-		d := targetDate.Add(time.Duration(i-6) * 24 * time.Hour)
-		key := d.Format("2006-01-02")
-		letter := dayLetters[d.Weekday()]
+		d := currentDay.AddDate(0, 0, i-6)
+		met := calorieGoal > 0 && bucket[d] >= calorieGoal
 		var state string
+		fire := false
 		switch {
-		case d.After(today):
-			state = "future"
-		case d.Equal(today):
+		case d.Equal(currentDay):
 			state = "today"
-		case loggedDays[key]:
+			fire = met
+		case met:
 			state = "hit"
 		default:
 			state = "miss"
 		}
-		week[i] = dto.DayState{Date: key, Letter: letter, State: state}
+		week[i] = dto.DayState{Date: d.Format("2006-01-02"), Letter: dayLetters[d.Weekday()], State: state, Fire: fire}
 	}
 
 	return &dto.SummaryResponse{
@@ -134,8 +162,9 @@ func (s SummaryService) GetSummary(userID uint, dateStr string) (*dto.SummaryRes
 			Current: currentWeight,
 			Goal:    goalWeight,
 		},
-		Streak: streak,
-		Week:   week,
+		Streak:            streak,
+		StreakActiveToday: todayMet,
+		Week:              week,
 	}, nil
 }
 
@@ -144,7 +173,7 @@ func (s SummaryService) GetSummary(userID uint, dateStr string) (*dto.SummaryRes
 // week  → 7 daily data points
 // month → 30 daily data points
 // year  → 12 monthly aggregated data points
-func (s SummaryService) GetStats(userID uint, rangeStr string) (*dto.StatsResponse, *errors.APIError) {
+func (s SummaryService) GetStats(userID uint, rangeStr string, offsetMin int) (*dto.StatsResponse, *errors.APIError) {
 	switch rangeStr {
 	case "", "week", "month", "year":
 	default:
@@ -179,12 +208,14 @@ func (s SummaryService) GetStats(userID uint, rangeStr string) (*dto.StatsRespon
 		end = time.Date(now.Year(), now.Month()+1, 1, 0, 0, 0, 0, time.UTC)
 	}
 
-	// Streak (calculated before the range-specific logic).
-	activeDays, err := sm.DaysWithEntries(userID)
+	// Streak: consecutive local 3am-anchored days whose calories met the goal.
+	entries, err := sm.AllEntryCalories(userID)
 	if err != nil {
 		return nil, errors.Internal("could not compute streak")
 	}
-	streak := computeStreak(activeDays)
+	bucket := bucketCaloriesByStreakDay(entries, offsetMin)
+	currentDay := localStreakDay(time.Now().UTC(), offsetMin)
+	streak, _ := computeCalorieStreak(bucket, calorieGoal, currentDay)
 
 	if rangeStr == "year" {
 		return s.buildYearStats(sm, userID, start, end, calorieGoal, streak)
