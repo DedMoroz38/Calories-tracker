@@ -133,14 +133,17 @@ func (s SummaryService) GetSummary(userID uint, dateStr string, offsetMin int) (
 	for i := range 7 {
 		d := monday.AddDate(0, 0, i)
 		met := calorieGoal > 0 && bucket[d] >= calorieGoal
+		logged := bucket[d] > 0
 		var state string
 		switch {
 		case d.After(currentDay):
 			state = "future"
+		case logged:
+			// Any calories logged shows green ("hit"); if the goal was met the
+			// fire flag below renders a flame on top.
+			state = "hit"
 		case d.Equal(currentDay):
 			state = "today"
-		case met:
-			state = "hit"
 		default:
 			state = "miss"
 		}
