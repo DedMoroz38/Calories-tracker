@@ -26,9 +26,30 @@ export interface CreateFoodPayload {
   protein?:  number;
 }
 
-/** GET /foods?date=YYYY-MM-DD */
-export async function getFoods(date?: string): Promise<FoodEntry[]> {
-  const qs = date ? `?date=${date}` : "";
+/** A half-open time window [from, to) of absolute instants. */
+export interface TimeRange {
+  from: Date;
+  to:   Date;
+}
+
+/**
+ * The local calendar day containing `d` (defaults to now), expressed as a
+ * [from, to) window of absolute instants. Boundaries are local midnight, so
+ * "today" is whatever the user's device considers today — the server stays
+ * timezone-agnostic and just filters on the instants we send.
+ */
+export function localDayRange(d: Date = new Date()): TimeRange {
+  const from = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const to   = new Date(from);
+  to.setDate(to.getDate() + 1);
+  return { from, to };
+}
+
+/** GET /foods?from=<RFC3339>&to=<RFC3339> — omit range to get all entries. */
+export async function getFoods(range?: TimeRange): Promise<FoodEntry[]> {
+  const qs = range
+    ? `?from=${encodeURIComponent(range.from.toISOString())}&to=${encodeURIComponent(range.to.toISOString())}`
+    : "";
   return http.get<FoodEntry[]>(`/foods${qs}`);
 }
 

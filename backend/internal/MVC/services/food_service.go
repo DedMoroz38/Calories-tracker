@@ -44,12 +44,13 @@ func (s FoodService) Create(userID uint, req dto.CreateFoodEntryRequest) (*db.Fo
 	return entry, nil
 }
 
-// List returns food entries belonging to the user. When day is non-zero only
-// entries for that calendar day are returned.
-func (s FoodService) List(userID uint, day time.Time) ([]db.FoodEntry, *errors.APIError) {
+// List returns food entries belonging to the user within the half-open window
+// [from, to). A zero from or to leaves that bound unconstrained, so passing
+// both zero returns every entry.
+func (s FoodService) List(userID uint, from, to time.Time) ([]db.FoodEntry, *errors.APIError) {
 	fm := models.FoodModel{DB: s.DB}
 
-	entries, err := fm.ListByUser(userID, day)
+	entries, err := fm.ListByUser(userID, from, to)
 	if err != nil {
 		return nil, errors.Internal("could not list food entries")
 	}

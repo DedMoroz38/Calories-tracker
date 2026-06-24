@@ -19,16 +19,18 @@ func (m FoodModel) Create(entry *db.FoodEntry) error {
 	return m.DB.Create(entry).Error
 }
 
-// ListByUser returns a user's food entries, most recently consumed first. When
-// day is non-zero only entries whose consumed_at falls on that calendar day
-// (UTC) are returned.
-func (m FoodModel) ListByUser(userID uint, day time.Time) ([]db.FoodEntry, error) {
+// ListByUser returns a user's food entries, most recently consumed first,
+// restricted to the half-open window [from, to). Either bound may be the zero
+// time to leave that side unconstrained; both zero returns all entries. The
+// bounds are absolute instants — no calendar/timezone logic happens here.
+func (m FoodModel) ListByUser(userID uint, from, to time.Time) ([]db.FoodEntry, error) {
 	var entries []db.FoodEntry
 	q := m.DB.Where("user_id = ?", userID)
-	if !day.IsZero() {
-		start := time.Date(day.Year(), day.Month(), day.Day(), 0, 0, 0, 0, time.UTC)
-		end := start.Add(24 * time.Hour)
-		q = q.Where("consumed_at >= ? AND consumed_at < ?", start, end)
+	if !from.IsZero() {
+		q = q.Where("consumed_at >= ?", from)
+	}
+	if !to.IsZero() {
+		q = q.Where("consumed_at < ?", to)
 	}
 	err := q.Order("consumed_at desc").Find(&entries).Error
 	return entries, err

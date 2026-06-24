@@ -8,7 +8,7 @@ import {
 } from "@/shared/ui";
 import { RouteGuard } from "@/features/auth/ui/RouteGuard";
 import { getSummary, type Summary } from "@/entities/stats/api/summaryRepository";
-import { getFoods, deleteFood, getRecentFoods, type FoodEntry, type RecentDish } from "@/entities/food/api/foodRepository";
+import { getFoods, deleteFood, getRecentFoods, localDayRange, type FoodEntry, type RecentDish } from "@/entities/food/api/foodRepository";
 import { AddSheet } from "@/widgets/add-sheet/AddSheet";
 import { WeightSheet } from "@/widgets/weight-sheet/WeightSheet";
 import styles from "./home.module.css";
@@ -26,7 +26,7 @@ function HomeScreen() {
     try {
       const [sum, f, r] = await Promise.all([
         getSummary(),
-        getFoods(),
+        getFoods(localDayRange()),
         getRecentFoods(),
       ]);
       setSummary(sum);

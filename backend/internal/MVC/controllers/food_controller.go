@@ -33,23 +33,34 @@ func (fc FoodController) Create(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(dto.BaseResponse{Data: entry})
 }
 
-// List handles GET /api/v1/foods with an optional ?date=YYYY-MM-DD filter.
+// List handles GET /api/v1/foods. The client supplies the half-open window it
+// cares about as absolute instants — ?from=<RFC3339>&to=<RFC3339> — typically
+// the user's local calendar day. Both are optional; when omitted that side of
+// the window is unbounded, so no params returns the user's full history. The
+// server makes no timezone assumptions: it only compares against consumed_at.
 func (fc FoodController) List(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c)
 
-	var day time.Time
-	if dateStr := c.Query("date"); dateStr != "" {
-		t, err := time.Parse("2006-01-02", dateStr)
+	var from, to time.Time
+	if s := c.Query("from"); s != "" {
+		t, err := time.Parse(time.RFC3339, s)
 		if err != nil {
-			return fc.Fail(c, errors.BadRequest("date must be YYYY-MM-DD"))
+			return fc.Fail(c, errors.BadRequest("from must be an RFC3339 timestamp"))
 		}
-		day = t.UTC()
+		from = t
+	}
+	if s := c.Query("to"); s != "" {
+		t, err := time.Parse(time.RFC3339, s)
+		if err != nil {
+			return fc.Fail(c, errors.BadRequest("to must be an RFC3339 timestamp"))
+		}
+		to = t
 	}
 
 	fs := services.FoodService{}
 	fs.DB = c.Locals("gorm").(*gorm.DB)
 
-	entries, apiErr := fs.List(userID, day)
+	entries, apiErr := fs.List(userID, from, to)
 	if apiErr != nil {
 		return fc.Fail(c, apiErr)
 	}
