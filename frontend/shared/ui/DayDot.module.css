@@ -21,14 +21,16 @@
 .today  { background: var(--state-today); box-shadow: 0 0 10px rgba(59,130,246,0.5); }
 .future { background: var(--state-future); }
 
-/* Streak flame — overrides the dot fill regardless of underlying state. */
+/* Streak flame — overrides the dot fill regardless of underlying state.
+   Solid vivid fill with a white flame so it reads clearly as a flame, not a
+   tinted dot. */
 .fire {
-  background: rgba(251, 146, 60, 0.18);
-  box-shadow: 0 0 12px rgba(251, 146, 60, 0.55);
+  background: linear-gradient(160deg, #fb923c 0%, #f97316 55%, #ef4444 100%);
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.7);
 }
 
 .flame {
-  color: var(--fire);
+  color: #fff;
 }
 
 .letter {

@@ -15,7 +15,7 @@ export function DayDot({ letter, state, fire = false }: DayDotProps) {
   return (
     <div className={styles.wrap}>
       <div className={[styles.dot, styles[state], fire ? styles.fire : ""].join(" ")}>
-        {fire && <Flame size={16} className={styles.flame} fill="currentColor" />}
+        {fire && <Flame size={18} className={styles.flame} fill="currentColor" strokeWidth={2.5} />}
       </div>
       <span className={styles.letter}>{letter}</span>
     </div>
