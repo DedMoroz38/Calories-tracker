@@ -7,6 +7,7 @@ package db
 type UserProfile struct {
 	ID            uint    `gorm:"primaryKey" json:"id"`
 	UserID        uint    `gorm:"uniqueIndex;not null" json:"user_id"`
+	User          User    `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"-"`
 	CalorieGoal   float64 `json:"calorie_goal"`
 	CarbsGoal     float64 `json:"carbs_goal"`
 	FatGoal       float64 `json:"fat_goal"`

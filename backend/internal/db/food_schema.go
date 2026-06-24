@@ -7,6 +7,7 @@ import "time"
 type FoodEntry struct {
 	ID         uint      `gorm:"primaryKey" json:"id"`
 	UserID     uint      `gorm:"index;not null" json:"user_id"`
+	User       User      `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"-"`
 	Name       string    `gorm:"not null" json:"name"`
 	Calories   float64   `json:"calories"`
 	Protein    float64   `json:"protein"`
