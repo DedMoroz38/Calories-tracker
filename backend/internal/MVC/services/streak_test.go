@@ -102,9 +102,12 @@ func TestComputeCalorieStreak(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			bucket := bucketCaloriesByStreakDay(tc.entries, tzPlus3)
-			streak, today := computeCalorieStreak(bucket, tc.goal, currentDay)
+			streak, today, days := computeCalorieStreak(bucket, tc.goal, currentDay)
 			if streak != tc.wantStreak {
 				t.Errorf("streak = %d, want %d", streak, tc.wantStreak)
+			}
+			if len(days) != tc.wantStreak {
+				t.Errorf("streakDays count = %d, want %d", len(days), tc.wantStreak)
 			}
 			if today != tc.wantToday {
 				t.Errorf("todayMet = %v, want %v", today, tc.wantToday)

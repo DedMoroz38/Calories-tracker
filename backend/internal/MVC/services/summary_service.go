@@ -54,9 +54,10 @@ func bucketCaloriesByStreakDay(entries []models.EntryCalories, offsetMin int) ma
 // itself has already hit the goal. An unmet current day does not break the
 // streak (the day isn't over yet) — it simply isn't counted, and the run of
 // completed days before it is still returned.
-func computeCalorieStreak(bucket map[time.Time]float64, goal float64, currentDay time.Time) (streak int, todayMet bool) {
+func computeCalorieStreak(bucket map[time.Time]float64, goal float64, currentDay time.Time) (streak int, todayMet bool, streakDays map[time.Time]bool) {
+	streakDays = map[time.Time]bool{}
 	if goal <= 0 {
-		return 0, false
+		return 0, false, streakDays
 	}
 	todayMet = bucket[currentDay] >= goal
 
@@ -66,9 +67,10 @@ func computeCalorieStreak(bucket map[time.Time]float64, goal float64, currentDay
 	}
 	for bucket[day] >= goal {
 		streak++
+		streakDays[day] = true
 		day = day.AddDate(0, 0, -1)
 	}
-	return streak, todayMet
+	return streak, todayMet, streakDays
 }
 
 // GetSummary builds the home-screen payload for the given date (default today).
@@ -122,26 +124,25 @@ func (s SummaryService) GetSummary(userID uint, dateStr string, offsetMin int) (
 	}
 	bucket := bucketCaloriesByStreakDay(entries, offsetMin)
 	currentDay := localStreakDay(time.Now().UTC(), offsetMin)
-	streak, todayMet := computeCalorieStreak(bucket, calorieGoal, currentDay)
+	streak, todayMet, streakDays := computeCalorieStreak(bucket, calorieGoal, currentDay)
 
 	// 7 streak-days ending on the current day. A day is a "hit" when its
-	// calories met the goal; today additionally carries the fire flag once met.
+	// calories met the goal; every day belonging to the active streak run also
+	// carries the fire flag so the whole streak shows flames.
 	week := make([]dto.DayState, 7)
 	for i := range 7 {
 		d := currentDay.AddDate(0, 0, i-6)
 		met := calorieGoal > 0 && bucket[d] >= calorieGoal
 		var state string
-		fire := false
 		switch {
 		case d.Equal(currentDay):
 			state = "today"
-			fire = met
 		case met:
 			state = "hit"
 		default:
 			state = "miss"
 		}
-		week[i] = dto.DayState{Date: d.Format("2006-01-02"), Letter: dayLetters[d.Weekday()], State: state, Fire: fire}
+		week[i] = dto.DayState{Date: d.Format("2006-01-02"), Letter: dayLetters[d.Weekday()], State: state, Fire: streakDays[d]}
 	}
 
 	return &dto.SummaryResponse{
@@ -215,7 +216,7 @@ func (s SummaryService) GetStats(userID uint, rangeStr string, offsetMin int) (*
 	}
 	bucket := bucketCaloriesByStreakDay(entries, offsetMin)
 	currentDay := localStreakDay(time.Now().UTC(), offsetMin)
-	streak, _ := computeCalorieStreak(bucket, calorieGoal, currentDay)
+	streak, _, _ := computeCalorieStreak(bucket, calorieGoal, currentDay)
 
 	if rangeStr == "year" {
 		return s.buildYearStats(sm, userID, start, end, calorieGoal, streak)
