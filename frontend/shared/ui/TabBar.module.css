@@ -4,13 +4,23 @@
   left: 0;
   right: 0;
   display: flex;
-  align-items: center;
-  justify-content: space-around;
+  justify-content: center;
   background: var(--surface-card);
   border-top: 1px solid var(--border);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   height: calc(60px + env(safe-area-inset-bottom, 0px));
   z-index: 100;
+}
+
+/* Constrain the controls to the same width as the page content; the bar
+   background itself stays full-width. */
+.inner {
+  width: 100%;
+  max-width: var(--page-max);
+  padding-inline: var(--gutter);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
 
 .tab {

@@ -20,16 +20,18 @@ export function TabBar({ onFabClick }: TabBarProps) {
 
   return (
     <nav className={styles.bar}>
-      {/* Left tab */}
-      <TabItem href={TABS[0].href} icon={TABS[0].icon} label={TABS[0].label} active={pathname === TABS[0].href} />
+      <div className={styles.inner}>
+        {/* Left tab */}
+        <TabItem href={TABS[0].href} icon={TABS[0].icon} label={TABS[0].label} active={pathname === TABS[0].href} />
 
-      {/* Centre FAB */}
-      <button className={styles.fab} onClick={onFabClick} aria-label="Add food entry">
-        <PlusCircle size={28} strokeWidth={1.8} />
-      </button>
+        {/* Centre FAB */}
+        <button className={styles.fab} onClick={onFabClick} aria-label="Add food entry">
+          <PlusCircle size={28} strokeWidth={1.8} />
+        </button>
 
-      {/* Right tab */}
-      <TabItem href={TABS[1].href} icon={TABS[1].icon} label={TABS[1].label} active={pathname === TABS[1].href} />
+        {/* Right tab */}
+        <TabItem href={TABS[1].href} icon={TABS[1].icon} label={TABS[1].label} active={pathname === TABS[1].href} />
+      </div>
     </nav>
   );
 }
