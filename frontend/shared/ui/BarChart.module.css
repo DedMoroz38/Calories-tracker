@@ -1,6 +1,7 @@
 .wrap {
   position: relative;
   width: 100%;
+  overflow: hidden;
 }
 
 .goalLine {
@@ -27,6 +28,7 @@
   flex-direction: column;
   align-items: center;
   flex: 1;
+  min-width: 0; /* allow columns to shrink below label width so a full month fits */
   height: 100%;
   justify-content: flex-end;
   gap: 4px;

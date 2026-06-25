@@ -15,6 +15,9 @@ export interface Profile {
   goal_weight:   number;
   direction:     "lose" | "maintain" | "gain";
   onboarded:     boolean;
+  first_name:    string;
+  username:      string;
+  avatar_url:    string;
 }
 
 export interface UpdateProfilePayload {

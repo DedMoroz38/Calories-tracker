@@ -39,4 +39,8 @@ type ProfileResponse struct {
 	GoalWeight    float64 `json:"goal_weight"`
 	Direction     string  `json:"direction"`
 	Onboarded     bool    `json:"onboarded"`
+	// Identity fields for the profile page header.
+	FirstName string `json:"first_name"`
+	Username  string `json:"username"`
+	AvatarURL string `json:"avatar_url"`
 }

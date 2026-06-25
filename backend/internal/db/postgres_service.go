@@ -25,7 +25,7 @@ func NewDBService() *DBService {
 		log.Fatal("failed to connect to database: ", err)
 	}
 
-	if err := database.AutoMigrate(&User{}, &FoodEntry{}, &UserProfile{}, &WeightEntry{}); err != nil {
+	if err := database.AutoMigrate(&User{}, &FoodEntry{}, &UserProfile{}, &WeightEntry{}, &Photo{}); err != nil {
 		log.Fatal("failed to migrate database: ", err)
 	}
 

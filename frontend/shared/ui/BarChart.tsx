@@ -31,8 +31,8 @@ export function BarChart({ data, goal, color = "var(--action)", height = 140 }: 
         />
       )}
       <div className={styles.bars}>
-        {data.map((d) => (
-          <div key={d.label} className={styles.barCol}>
+        {data.map((d, i) => (
+          <div key={i} className={styles.barCol}>
             <div
               className={[styles.bar, d.muted ? styles.muted : ""].filter(Boolean).join(" ")}
               style={{

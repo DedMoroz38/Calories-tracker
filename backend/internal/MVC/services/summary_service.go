@@ -202,16 +202,18 @@ func (s SummaryService) GetStats(userID uint, rangeStr string, offsetMin int) (*
 
 	switch rangeStr {
 	case "week":
-		start = now.Add(-6 * 24 * time.Hour)
-		end = now.Add(24 * time.Hour)
+		// Monday-anchored calendar week containing today (Mon..Sun).
+		daysSinceMonday := (int(now.Weekday()) + 6) % 7
+		start = now.AddDate(0, 0, -daysSinceMonday)
+		end = start.AddDate(0, 0, 7)
 	case "month":
-		start = now.Add(-29 * 24 * time.Hour)
-		end = now.Add(24 * time.Hour)
+		// Calendar month containing today (1st..end of month).
+		start = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.UTC)
+		end = start.AddDate(0, 1, 0)
 	case "year":
-		// 12 months ending with (and including) the current month.
-		// Subtract 11 months from the start of this month to get the first month.
-		start = time.Date(now.Year(), now.Month()-11, 1, 0, 0, 0, 0, time.UTC)
-		end = time.Date(now.Year(), now.Month()+1, 1, 0, 0, 0, 0, time.UTC)
+		// Calendar year containing today (Jan..Dec).
+		start = time.Date(now.Year(), 1, 1, 0, 0, 0, 0, time.UTC)
+		end = start.AddDate(1, 0, 0)
 	}
 
 	// Streak: consecutive local 3am-anchored days whose calories met the goal.
@@ -238,6 +240,13 @@ func (s SummaryService) GetStats(userID uint, rangeStr string, offsetMin int) (*
 	daysUnderGoal := 0
 	for i, t := range dayTotals {
 		label := labelForDay(rangeStr, t.Date, i)
+		if rangeStr == "month" {
+			// A calendar month is up to 31 bars; only label the 1st and every
+			// 5th day so the axis stays readable and within the card.
+			if day := t.Date.Day(); day != 1 && day%5 != 0 {
+				label = ""
+			}
+		}
 		caloriesPerDay[i] = dto.CaloriesEntry{
 			Label: label,
 			Date:  t.Date.Format("2006-01-02"),

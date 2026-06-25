@@ -11,5 +11,8 @@ type User struct {
 	LastName   string    `json:"last_name"`
 	Username   string    `json:"username"`
 	PhotoURL   string    `json:"photo_url"`
-	CreatedAt  time.Time `json:"created_at"`
+	// AvatarKey is the S3 object key of a user-uploaded avatar. When empty the
+	// Telegram PhotoURL is used as a fallback.
+	AvatarKey string    `json:"-"`
+	CreatedAt time.Time `json:"created_at"`
 }

@@ -25,4 +25,6 @@ func RegisterApi(app *fiber.App) {
 	RegisterWeightRoutes(v1.Group("/weights"))
 	RegisterSummaryRoutes(v1.Group("/summary"))
 	RegisterStatsRoutes(v1.Group("/stats"))
+	RegisterPhotoRoutes(v1.Group("/photos"))
+	RegisterFeedRoutes(v1.Group("/feed"))
 }

@@ -114,6 +114,43 @@ export async function request<T>(
   return payload as unknown as T;
 }
 
+// ─── Multipart upload ─────────────────────────────────────────────────────
+
+/**
+ * Uploads a single file as multipart/form-data under the field name `file`.
+ * Unlike `request`, the Content-Type header is left unset so the browser adds
+ * the correct multipart boundary. Returns the unwrapped `data` field.
+ */
+export async function uploadFile<T>(path: string, file: File): Promise<T> {
+  const form = new FormData();
+  form.append("file", file);
+
+  const headers: Record<string, string> = {};
+  const token = getToken();
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch(`${API_V1}${path}`, {
+    method: "POST",
+    headers,
+    body: form,
+  });
+
+  let payload: Record<string, unknown> = {};
+  try {
+    payload = await res.json();
+  } catch {
+    // Non-JSON response — leave payload empty.
+  }
+
+  if (!res.ok) {
+    const message =
+      typeof payload["message"] === "string" ? payload["message"] : `HTTP ${res.status}`;
+    throw new ApiError(res.status, message);
+  }
+
+  return "data" in payload ? (payload["data"] as T) : (payload as unknown as T);
+}
+
 // ─── Convenience aliases ──────────────────────────────────────────────────
 
 export const http = {

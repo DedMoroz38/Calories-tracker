@@ -12,9 +12,11 @@ import (
 // router. Every endpoint is protected by JWT auth.
 func RegisterProfileRoutes(router fiber.Router) {
 	pc := controllers.ProfileController{}
+	photoC := controllers.PhotoController{}
 
 	router.Use(middleware.CheckJWT())
 
 	router.Get("/", pc.GetProfile)
 	router.Put("/", middleware.BodyValidation(&dto.UpdateProfileRequest{}), pc.UpdateProfile)
+	router.Post("/avatar", photoC.SetAvatar)
 }

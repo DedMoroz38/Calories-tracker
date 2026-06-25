@@ -21,24 +21,34 @@ type ProfileService struct {
 // user has not onboarded) a zero-value response with Onboarded=false is
 // returned rather than an error.
 func (s ProfileService) GetProfile(userID uint) (*dto.ProfileResponse, *errors.APIError) {
+	// Identity fields (name + avatar) come from the user row and exist even
+	// before onboarding, so resolve them first.
+	resp := &dto.ProfileResponse{}
+	am := models.AuthModel{DB: s.DB}
+	if u, err := am.FindByID(userID); err == nil {
+		resp.FirstName = u.FirstName
+		resp.Username = u.Username
+		resp.AvatarURL = avatarURL(u.AvatarKey, u.PhotoURL)
+	}
+
 	pm := models.ProfileModel{DB: s.DB}
 	p, err := pm.FindByUserID(userID)
 	if err != nil {
 		if stderrors.Is(err, gorm.ErrRecordNotFound) {
-			return &dto.ProfileResponse{Onboarded: false}, nil
+			resp.Onboarded = false
+			return resp, nil
 		}
 		return nil, errors.Internal("could not load profile")
 	}
-	return &dto.ProfileResponse{
-		CalorieGoal:   p.CalorieGoal,
-		CarbsGoal:     p.CarbsGoal,
-		FatGoal:       p.FatGoal,
-		ProteinGoal:   p.ProteinGoal,
-		CurrentWeight: p.CurrentWeight,
-		GoalWeight:    p.GoalWeight,
-		Direction:     p.Direction,
-		Onboarded:     p.Onboarded,
-	}, nil
+	resp.CalorieGoal = p.CalorieGoal
+	resp.CarbsGoal = p.CarbsGoal
+	resp.FatGoal = p.FatGoal
+	resp.ProteinGoal = p.ProteinGoal
+	resp.CurrentWeight = p.CurrentWeight
+	resp.GoalWeight = p.GoalWeight
+	resp.Direction = p.Direction
+	resp.Onboarded = p.Onboarded
+	return resp, nil
 }
 
 // UpdateProfile upserts the user's profile and sets Onboarded = true. When the

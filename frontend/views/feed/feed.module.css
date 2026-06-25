@@ -1,0 +1,107 @@
+.root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) var(--gutter) 16px;
+  max-width: var(--page-max);
+  margin: 0 auto;
+}
+
+.title {
+  font-size: var(--text-h2);
+  font-weight: var(--weight-bold);
+}
+
+.errMsg {
+  color: var(--destructive);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.post {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.postHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  min-width: 0;
+}
+
+.authorAvatar,
+.authorFallback {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-pill);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.authorFallback {
+  background: var(--action-surface);
+  color: var(--action);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.authorName {
+  font-weight: var(--weight-medium);
+  font-size: var(--text-body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.postTime {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+/* Full-bleed image, natural aspect ratio, never wider than the card. */
+.postImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  object-fit: cover;
+  background: var(--surface-card-2);
+}
+
+.empty,
+.loadingMsg {
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  text-align: center;
+  padding: 24px 0;
+}
+
+.sentinel {
+  height: 1px;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  padding: 10px 16px;
+  border-radius: var(--r-pill);
+  z-index: 200;
+  box-shadow: var(--shadow-md);
+}
